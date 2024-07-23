@@ -13,5 +13,6 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/_layout.jsx", "app/index.tsxx.jsx", "app/tabs/map.jsx" ,
+"app/tabs.home.jsx" ]
 }
