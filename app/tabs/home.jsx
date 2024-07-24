@@ -2,6 +2,19 @@ import React, {useState, useEffect}from 'react';
 import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity} from 'react-native'
 import axios from 'axios'; 
 
+const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal (i.e N,E,S,W etc...)
+if (degrees >= 337.5 || degrees < 22.5) return 'N';
+if (degrees >= 22.5 && degrees < 67.5) return 'NE';
+if (degrees >= 67.5 && degrees < 112.5) return 'E';
+if (degrees >= 112.5 && degrees < 157.5) return 'SE';
+if (degrees >= 157.5 && degrees < 202.5) return 'S';
+if (degrees >= 202.5 && degrees < 247.5) return 'SW';
+if (degrees >= 247.5 && degrees < 292.5) return 'W';
+if (degrees >= 292.5 && degrees < 337.5) return 'NW';
+return 'Unknown'; // if degrees is out of range
+};
+
+
 const Home = () => {  //Home screen component
   const[locations,setLocations] = useState([]); // hook to store fetched location data from server
   const[search, setSearch] = useState(''); //search filter hook that stores user inputed string 
@@ -96,8 +109,36 @@ const handleSurfDisplay = () => {
                 >
                   <Text style={styles.surfDisplayButtonText}>
                     See todays surf!
-                  </Text>
+                  </Text> 
                 </TouchableOpacity>
+                {/* presenting the surf data to user once the button is triggered*/}
+                {surfDisplay && surfConditions && {/*if both of these are true the view is triggered */}(
+                  <ScrollView horizontal style={styles.surfConditionsContainer}> 
+                  {/* loop through each condition in the array, as it is recorded hourly,stored as index and render in the view*/}
+                    {surfConditions.map((condition, index) => ( 
+                      <View key={index} style={styles.conditionItem}>
+                        <Text style={styles.conditionText}>
+                          Time: {new Date(condition.time).toLocaleTimeString()}
+                        </Text>
+                        <Text style={styles.conditionText}>
+                          Wave Height: {condition.waveHeight.sg} metres
+                        </Text>
+                        <Text style={styles.conditionText}>
+                          Period: {condition.wavePeriod.sg} seconds
+                        </Text>
+                        <Text style={styles.conditionText}>
+                          Wave Direction: {condition.waveDirection.sg} degrees
+                        </Text>
+                        <Text style={styles.conditionText}>
+                          Wind Speed: {condition.windSpeed.sg} mph
+                        </Text>
+                        <Text style={styles.conditionText}>
+                          Wind Direction: {convertWindDirection(condition.windDirection.sg)} 
+                        </Text> 
+                      </View>
+                    ))}
+                  </ScrollView>
+                )}
               </View> 
             )}
           </View>
@@ -174,5 +215,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  surfConditionsContainer: {
+    marginTop: 16,
+    paddingVertical: 10,
+  },
+  conditionItem: {
+    marginRight: 16,
+    width: 300, 
+  },
+  conditionText: {
+    fontSize: 14,
+    color: '#000000',
+    marginVertical: 4,
   },
 });
