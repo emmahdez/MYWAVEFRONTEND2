@@ -2,7 +2,7 @@ import React, {useState, useEffect}from 'react';
 import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity} from 'react-native'
 import axios from 'axios'; 
 
-const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal (i.e N,E,S,W etc...)
+const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal units (i.e N,E,S,W etc...)
 if (degrees >= 337.5 || degrees < 22.5) return 'N';
 if (degrees >= 22.5 && degrees < 67.5) return 'NE';
 if (degrees >= 67.5 && degrees < 112.5) return 'E';
