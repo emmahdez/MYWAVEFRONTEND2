@@ -7,8 +7,10 @@ const Home = () => {  //Home screen component
   const[search, setSearch] = useState(''); //search filter hook that stores user inputed string 
   const[returnedLocations, setReturnedLocations] = useState([]); //hook to store the search location which matches user input
   const[locationSelected, setLocationSelected] = useState(null); //hook to store the selected location
+  const[surfConditions, setSurfConditions] = useState(null); //hook to store fetched surf data from the server
+  const[surfDisplay, setSurfDisplay] = useState(false); //hook to display the surf data, set default to false
   
-  useEffect(() => { //useEffect to render location data
+  useEffect(() => { //useEffect to...
     const fetchLocations = async () => {
       try{
         const locationApi = await axios.get('http://192.168.1.91:8000/locations/'); //GET request to Django REST
@@ -30,13 +32,30 @@ const Home = () => {  //Home screen component
     ); setReturnedLocations(response); //make retuned location state the response of the users search 
   };
 
+  const fetchSurfConditions = async (beachName) => {
+    try {
+      const response = await axios.get(`http://192.168.1.91:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django rest
+      setSurfConditions(response.data.data.hours); //returns hourly data 
+    } catch (error) {
+      console.error(error); //console error log
+    }
+  };
+
   const handlePress = (location) => { //function that deals with a user selecting a location by pressing on it 
     if (locationSelected && locationSelected.beach_name === location.beach_name) { //conditions if user has selected location item
+      
       setLocationSelected(null); //null to deselect location if conditions above hold
+      setSurfDisplay(false); 
     } else {
       setLocationSelected(location); //set the user selected location
+      fetchSurfConditions(location.beach_name); //fetch the surf data based off beach name on press
+      setSurfDisplay(false);
     } 
   };
+const handleSurfDisplay = () => {
+  setSurfDisplay(!surfDisplay); //display the surf data, make not false so it shows onpress below
+}
+  
 
   
   return (  //returns what user is able to see/interact with
@@ -71,7 +90,15 @@ const Home = () => {  //Home screen component
                 style={styles.peaseBay} //image styles
               />
               <Text style={styles.descriptionText}>{locationSelected.description}</Text>
-              </View> //display of image with description
+              <TouchableOpacity // button that user can press to see surf data
+                  style={styles.surfDisplayButton} //styling for the button
+                  onPress={handleSurfDisplay} //call to surf data display function
+                >
+                  <Text style={styles.surfDisplayButtonText}>
+                    See todays surf!
+                  </Text>
+                </TouchableOpacity>
+              </View> 
             )}
           </View>
         )}
@@ -132,5 +159,20 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150,
     borderRadius: 100,
+  },
+
+  surfDisplayButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    padding: 10,
+    position:'absolute',
+    top:60,
+    right:10
+    
+  },
+  surfDisplayButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
