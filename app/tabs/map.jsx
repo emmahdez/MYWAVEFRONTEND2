@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput,ActionSheetIOS,Button} from 'react-native';
+import { StyleSheet, Text, View, TextInput,ActionSheetIOS,Button,ImageBackground} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -49,7 +49,10 @@ const Map = () => { // Map component
  
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
+       <ImageBackground
+        source={require('@/assets/images/water.png')}
+        style={styles.inputContainer}
+        >
         <TextInput
           style={styles.search}
           placeholder='Search beach on map...'
@@ -57,7 +60,7 @@ const Map = () => { // Map component
           onChangeText={setSearchMap}
         />
         <Button title="Filter by beach type" onPress={showActionSheet} />
-      </View>
+      </ImageBackground>
       <View style={styles.mapContainer}>
         <MapView
           style={styles.map}
@@ -89,20 +92,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inputContainer: {
+    position: 'absolute', 
     flexDirection: 'row',
     padding: 10,
     backgroundColor: '#aad3f2',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
     zIndex: 1, 
     elevation: 4, 
     alignItems: 'center',
+    paddingTop:40,
+    
+
   },
   search: {
     flex: 1,
     height: 50,
-    borderColor: 'black',
-    borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     backgroundColor: 'white', 

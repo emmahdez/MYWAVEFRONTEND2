@@ -135,12 +135,13 @@ const handleSurfDisplay = () => {
                         </Text> 
                       </View>
                     ))}
-                  </ScrollView>
+                  </ScrollView> 
                 )}
               </View> 
             )}
           </View>
         )}
+
       />
     </View>
   );

@@ -5,9 +5,18 @@ import HomeScreen from "./home";
 const TabsLayout = () => {
     return (
         <>
-          <Tabs>
+          <Tabs options={{ headerShown: false}}>
             <Tabs.Screen
                 name="home"
+                options= {{headerShown:false}}
+                />
+                <Tabs.Screen
+                name="map"
+                options= {{headerShown:false}}
+                />
+                <Tabs.Screen
+                name="myBreaks"
+                options= {{headerShown:false}}
                 />
             </Tabs>
          </>
