@@ -14,7 +14,7 @@ export default function WelcomeScreen() {
       <View style={styles.container}>
         <Text style={styles.text}>Welcome to MyWave!</Text>
         <StatusBar style="auto" />
-        <Link href= "../tabs/home" style={styles.link}>Click here to explore</Link>
+        <Link href= "../tabs/home" style={styles.link}>Press here to explore</Link>
       </View>
     </ImageBackground>
   );

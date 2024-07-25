@@ -2,7 +2,7 @@ import React, {useState, useEffect}from 'react';
 import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity} from 'react-native'
 import axios from 'axios'; 
 
-const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal units (i.e N,E,S,W etc...)
+const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal (i.e N,E,S,W etc...)
 if (degrees >= 337.5 || degrees < 22.5) return 'N';
 if (degrees >= 22.5 && degrees < 67.5) return 'NE';
 if (degrees >= 67.5 && degrees < 112.5) return 'E';
@@ -111,10 +111,8 @@ const handleSurfDisplay = () => {
                     See todays surf!
                   </Text> 
                 </TouchableOpacity>
-                {/* presenting the surf data to user once the button is triggered*/}
-                {surfDisplay && surfConditions && {/*if both of these are true the view is triggered */}(
+                {surfDisplay && surfConditions && (
                   <ScrollView horizontal style={styles.surfConditionsContainer}> 
-                  {/* loop through each condition in the array, as it is recorded hourly,stored as index and render in the view*/}
                     {surfConditions.map((condition, index) => ( 
                       <View key={index} style={styles.conditionItem}>
                         <Text style={styles.conditionText}>
