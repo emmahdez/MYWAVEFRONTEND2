@@ -1,5 +1,5 @@
 import React, {useState, useEffect}from 'react';
-import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity} from 'react-native'
+import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity,ImageBackground} from 'react-native'
 import axios from 'axios'; 
 
 const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal (i.e N,E,S,W etc...)
@@ -72,6 +72,11 @@ const handleSurfDisplay = () => {
 
   
   return (  //returns what user is able to see/interact with
+    <ImageBackground
+      source={require('@/assets/images/water.png')} // Replace with your background image path
+      style={styles.backgroundImage}
+      imageStyle={styles.image}
+    >
     <View style={styles.container}>
       <Text style={styles.welcome}>Search for a break</Text>
       <TextInput
@@ -144,43 +149,58 @@ const handleSurfDisplay = () => {
 
       />
     </View>
+    </ImageBackground>
   );
 };
 
 export default Home;
 
 // all the styles for the home component
+
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  image: {
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+  },
+  welcomeContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
   welcome: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#000000',
     marginBottom: 20,
-    textAlign: 'center',
+    alignSelf:'center'
   },
   searchBar: {
     height: 40,
-    borderColor: 'gray',
+    width: '100%',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginBottom: 20,
+    backgroundColor:'white'
   },
   locationItem: {
     padding: 16,
     borderRadius: 8,
     marginVertical: 8,
     alignItems: 'center',
+    backgroundColor:'#e0f7fa'
   },
   locationText: {
     fontSize: 18,
     color: '#000000',
-    fontWeight:'bold'
+    fontWeight: 'bold',
   },
   descriptionContainer: {
     marginTop: 10,
@@ -192,23 +212,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000000',
     fontWeight: '500',
-    fontStyle:'italic',
-    marginTop:16
+    fontStyle: 'italic',
+    marginTop: 16,
   },
   peaseBay: {
     height: 150,
     width: 150,
     borderRadius: 100,
   },
-
   surfDisplayButton: {
     backgroundColor: '#2196F3',
     borderRadius: 20,
     padding: 10,
-    position:'absolute',
-    top:60,
-    right:10
-    
+    position: 'absolute',
+    top: 60,
+    right: 10,
   },
   surfDisplayButtonText: {
     color: 'white',
@@ -221,7 +239,7 @@ const styles = StyleSheet.create({
   },
   conditionItem: {
     marginRight: 16,
-    width: 300, 
+    width: 300,
   },
   conditionText: {
     fontSize: 14,
