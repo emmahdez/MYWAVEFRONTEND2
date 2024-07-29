@@ -1,17 +1,26 @@
 import React, {useState, useEffect}from 'react';
-import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity,ImageBackground} from 'react-native'
+import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable,ScrollView,Image,TouchableOpacity,ImageBackground} from 'react-native';
 import axios from 'axios'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal (i.e N,E,S,W etc...)
-if (degrees >= 337.5 || degrees < 22.5) return 'N';
-if (degrees >= 22.5 && degrees < 67.5) return 'NE';
-if (degrees >= 67.5 && degrees < 112.5) return 'E';
-if (degrees >= 112.5 && degrees < 157.5) return 'SE';
-if (degrees >= 157.5 && degrees < 202.5) return 'S';
-if (degrees >= 202.5 && degrees < 247.5) return 'SW';
-if (degrees >= 247.5 && degrees < 292.5) return 'W';
-if (degrees >= 292.5 && degrees < 337.5) return 'NW';
-return 'Unknown'; // if degrees is out of range
+if (degrees >= 350 || degrees <= 10) return 'N';
+if (degrees >= 20 && degrees <= 30) return 'N/NE';
+if (degrees >= 40 && degrees <= 50) return 'NE';
+if (degrees >= 60 && degrees <= 70) return 'E/NE';
+if (degrees >= 80 && degrees <= 100) return 'E';
+if (degrees >= 110 && degrees <= 120) return 'E/SE';
+if (degrees >= 130 && degrees <= 140) return 'SE';
+if (degrees >= 150 && degrees <= 160) return 'S/SE';
+if (degrees >= 170 && degrees <= 190) return 'S';
+if (degrees >= 200 && degrees <= 210) return 'S/SW';
+if (degrees >= 220 && degrees <= 230) return 'SW';
+if (degrees >= 240 && degrees <= 250) return 'W/SW';
+if (degrees >= 260 && degrees <= 280) return 'W';
+if (degrees >= 290 && degrees <=300) return 'W/NW';
+if (degrees >= 310 && degrees <= 320) return 'NW';
+if (degrees >= 330 && degrees <= 340) return 'NE';
+else return 'Unknown'; // if degrees is out of range
 };
 
 
@@ -25,14 +34,10 @@ const Home = () => {  //Home screen component
   
   useEffect(() => { //useEffect to...
     const fetchLocations = async () => {
-      try{
-        const locationApi = await axios.get('http://192.168.1.91:8000/locations/'); //GET request to Django REST
+        const locationApi = await axios.get('http://192.168.0.24:8000/locations/'); //GET request to Django REST
         console.log(locationApi.data);
         setLocations(locationApi.data); //set locations as the returned data
         setReturnedLocations(locationApi.data) //set returned locations to returned data 
-      } catch (error) {
-        console.error(error); // console error log 
-      }
     };
    fetchLocations(); //call the to the fetchLocation function
   }, []);
@@ -46,12 +51,9 @@ const Home = () => {  //Home screen component
   };
 
   const fetchSurfConditions = async (beachName) => {
-    try {
-      const response = await axios.get(`http://192.168.1.91:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django rest
+      const response = await axios.get(`http://192.168.0.24:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django rest
       setSurfConditions(response.data.data.hours); //returns hourly data 
-    } catch (error) {
-      console.error(error); //console error log
-    }
+  
   };
 
   const handlePress = (location) => { //function that deals with a user selecting a location by pressing on it 
@@ -68,12 +70,22 @@ const Home = () => {  //Home screen component
 const handleSurfDisplay = () => {
   setSurfDisplay(!surfDisplay); //display the surf data, make not false so it shows onpress below
 }
-  
 
+const saveLocation = async (location) => { //function so that users can save spots on their device locally using AsyncStorage
+    const savedLocations = await AsyncStorage.getItem('savedLocations'); //retrieve saved locations from local storage
+    const parsedLocations = JSON.parse(savedLocations); // parse 
+      if (!parsedLocations.some(loc => loc.beach_name === location.beach_name)) {
+        parsedLocations.push(location);
+        await AsyncStorage.setItem('savedLocations', JSON.stringify(parsedLocations));
+        alert('Beach saved to MyBreaks!');
+      } else {
+        alert('Already saved to MyBreaks');
+      }
+    };
   
-  return (  //returns what user is able to see/interact with
+  return (  //returns what user is able to see and interact with
     <ImageBackground
-      source={require('@/assets/images/water.png')} // Replace with your background image path
+      source={require('@/assets/images/water2.png')} // Replace with your background image path
       style={styles.backgroundImage}
       imageStyle={styles.image}
     >
@@ -104,11 +116,18 @@ const handleSurfDisplay = () => {
           {locationSelected && locationSelected.beach_name === item.beach_name && ( 
             <View style={styles.descriptionContainer}> 
               <Image
-                source={require('@/assets/images/pease-bay-leisure-park.jpg')} //image of location, would have to add these seperately to a database somehow, not unique to each location
+                source={require('@/assets/images/wave.jpg')} //image of location, would have to add these seperately to a database somehow, not unique to each location
                 style={styles.peaseBay} //image styles
               />
               <Text style={styles.descriptionText}>{locationSelected.description}</Text>
-              <TouchableOpacity // button that user can press to see surf data
+              <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={() => saveLocation(locationSelected)}
+                  >
+                    <Text style={styles.saveButtonText}>Save Location</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                        // button that user can press to see surf data
                   style={styles.surfDisplayButton} //styling for the button
                   onPress={handleSurfDisplay} //call to surf data display function
                 >
@@ -178,9 +197,10 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 20,
-    alignSelf:'center'
+    color: 'grey',
+    marginBottom:20,
+    alignSelf:'center',
+
   },
   searchBar: {
     height: 40,
@@ -220,12 +240,25 @@ const styles = StyleSheet.create({
     width: 150,
     borderRadius: 100,
   },
+  saveButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    padding: 10,
+    position:'absolute',
+    top: 120,
+    right:15,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   surfDisplayButton: {
     backgroundColor: '#2196F3',
     borderRadius: 20,
     padding: 10,
     position: 'absolute',
-    top: 60,
+    top: 30,
     right: 10,
   },
   surfDisplayButtonText: {
