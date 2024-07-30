@@ -174,6 +174,8 @@ const saveLocation = async (location) => { //function so that users can save spo
 
 export default Home;
 
+//I kept breaking code by commenting inside of the surfdisplay container but basically what that whole section of code does is  
+
 // all the styles for the home component
 
 const styles = StyleSheet.create({
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'grey',
+    color: 'white',
     marginBottom:20,
     alignSelf:'center',
 

@@ -13,6 +13,7 @@ export default function WelcomeScreen() {
     >
       <View style={styles.container}>
         <Text style={styles.text}>Welcome to MyWave!</Text>
+        <Text style={styles.description}>24hr surf forecasts for the best spots in Scotland</Text>
         <StatusBar style="auto" />
         <Link href= "../tabs/home" style={styles.link}>Press here to explore</Link>
       </View>
@@ -36,6 +37,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000000',
+  },
+
+  description: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+    
   },
   link: {
     color: 'blue',
