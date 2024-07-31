@@ -5,11 +5,11 @@ import axios from 'axios';
 ;
 
 const Map = () => { // Map component
-  const [locations, setLocations] = useState([]); // Hook to store location data from Django API
-  const [searchMap, setSearchMap] = useState(''); // Hook to store user search
-  const [filter, setFilter] = useState(''); // Hook to store beach type filter
+  const [locations, setLocations] = useState([]); // Hook to initialize empty array to hold location data
+  const [searchMap, setSearchMap] = useState(''); // Hook to initialize empty string for a user search
+  const [filter, setFilter] = useState(''); // Hook to initialize an empty string for filtering 
 
-  useEffect(() => { // useEffect to fetch locations from API
+  useEffect(() => { // useEffect to fetch locations from django
     const fetchLocations = async () => {
         const response = await axios.get('http://192.168.0.24:8000/locations/'); // GET request to Django
         setLocations(response.data); // Set the locations to be the fetched data
@@ -17,26 +17,25 @@ const Map = () => { // Map component
     fetchLocations();
   }, []);
 
-  // Filter locations based on search input and selected filter
-  const filteredBeaches = locations.filter(location => {
-    const matchesSearchMap = location.beach_name.toLowerCase().includes(searchMap.toLowerCase());
-    const matchesFilter = filter === '' || location.beach_type === filter;
-    return matchesSearchMap && matchesFilter;
+  // Filter locations based on search input and filters out the markers according to what the user is inputting in the search string
+  const filteredBeaches = locations.filter(location => { //a filtering function for the user search bar 
+    const matchesSearchMap = location.beach_name.toLowerCase().includes(searchMap.toLowerCase()); //case insensitive
+    const matchesFilter = filter === '' || location.beach_type === filter; 
+    return matchesSearchMap && matchesFilter; //returns user input
   });
 
-   // Function to show ActionSheetIOS
+   // React native ActionSheetIOS to filter the markers, tried using Picker but I couldnt get it to function, Picker would be better
    const showActionSheet = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         title: 'Select a beach type',
         options: ['All Beach Types', 'Sandy', 'Reef break', 'Cancel'],
-        cancelButtonIndex: 3, 
+        cancelButtonIndex: 3, //indexing starts at 0
       },
-      (buttonIndex) => {
-        // Handle the selection
-        const filterOptions = ['', 'Sandy', 'Reef break'];
-        if (buttonIndex !== 3) { // Exclude cancel option
-          setFilter(filterOptions[buttonIndex]);
+      (buttonIndex) => { //index of selected option
+        const filterOptions = ['', 'Sandy', 'Reef break']; //emtpy string for placeholder of default which is "All beach types"
+        if (buttonIndex !== 3) {  //if the user doesnt select the cancel button
+          setFilter(filterOptions[buttonIndex]); //the filter is set to whichever option user selected
         }
       }
     );
@@ -54,8 +53,8 @@ const Map = () => { // Map component
           placeholder='Search beach on map...'
           value={searchMap}
           onChangeText={setSearchMap}
-        />
-        <Button title="Filter by beach type" onPress={showActionSheet} />
+        /> 
+        <Button title="Filter by beach type" onPress={showActionSheet}  /> 
       </ImageBackground>
       <View style={styles.mapContainer}>
         <MapView
@@ -70,7 +69,7 @@ const Map = () => { // Map component
                 latitude: parseFloat(location.latitude), // Lat and long coordinates where the marker will be placed from location data
                 longitude: parseFloat(location.longitude),
               }}
-              title={location.beach_name} // Shows only the beach name
+              title={location.beach_name} // Shows the beach name
               description={`Beach Type: ${location.beach_type}`} // Shows the beach type
             />
           ))}
@@ -113,3 +112,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+
+//should have done more error checks

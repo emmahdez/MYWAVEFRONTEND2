@@ -25,46 +25,45 @@ else return 'Unknown'; // if degrees is out of range
 
 
 const Home = () => {  //Home screen component
-  const[locations,setLocations] = useState([]); // hook to store fetched location data from server
-  const[search, setSearch] = useState(''); //search filter hook that stores user inputed string 
-  const[returnedLocations, setReturnedLocations] = useState([]); //hook to store the search location which matches user input
-  const[locationSelected, setLocationSelected] = useState(null); //hook to store the selected location
-  const[surfConditions, setSurfConditions] = useState(null); //hook to store fetched surf data from the server
-  const[surfDisplay, setSurfDisplay] = useState(false); //hook to display the surf data, set default to false
+  const[locations,setLocations] = useState([]); // useState hook to initialize an empty array, to then store fetched location data from useEffect 
+  const[search, setSearch] = useState(''); // hook to initialize an empty string, to then store user inputed string in the search bar 
+  const[returnedLocations, setReturnedLocations] = useState([]); //hook to initialize an empty array of returned locations that a user searches for, (naming convention)
+  const[locationSelected, setLocationSelected] = useState(null); //hook to initialize a null value for a user selected beach i.e it defaults to no location being selected
+  const[surfConditions, setSurfConditions] = useState(null); //hook to initialize null value for a user selecting to view the surf conditions, (should re-consider naming convention)
+  const[surfDisplay, setSurfDisplay] = useState(false); //hook to initialize the surf forecast display container to false, i.e defaulted to not be fetched until prompted by a user
   
-  useEffect(() => { //useEffect to...
+  useEffect(() => { //useEffect to fetch location data from Django backend
     const fetchLocations = async () => {
-        const locationApi = await axios.get('http://192.168.0.24:8000/locations/'); //GET request to Django REST
-        console.log(locationApi.data);
-        setLocations(locationApi.data); //set locations as the returned data
-        setReturnedLocations(locationApi.data) //set returned locations to returned data 
+        const locationApi = await axios.get('http://192.168.0.24:8000/locations/'); //GET request to Django
+        setLocations(locationApi.data); //set locations state as ALL the returned data
+        setReturnedLocations(locationApi.data) //set returned locations state (via user search )as the returned data 
     };
-   fetchLocations(); //call the to the fetchLocation function
-  }, []);
+   fetchLocations(); //call the to the fetchLocation function to run async operation
+  }, []); // empty dependency array
 
   const manageSearch = (userSearch) => { //function that deals with user input of search bar 
     setSearch(userSearch); //make search state the user input
     const response = locations.filter(item =>  //search filter response
       item.beach_name.toLowerCase().includes(userSearch.toLowerCase()) //toLowerCase makes it case insensitive
 
-    ); setReturnedLocations(response); //make retuned location state the response of the users search 
+    ); setReturnedLocations(response); //make returned location state the response of the users search 
   };
 
   const fetchSurfConditions = async (beachName) => {
-      const response = await axios.get(`http://192.168.0.24:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django rest
-      setSurfConditions(response.data.data.hours); //returns hourly data 
+      const response = await axios.get(`http://192.168.0.24:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django
+      setSurfConditions(response.data.data.hours); //nested data to return hourly data 
   
   };
 
   const handlePress = (location) => { //function that deals with a user selecting a location by pressing on it 
-    if (locationSelected && locationSelected.beach_name === location.beach_name) { //conditions if user has selected location item
+    if (locationSelected && locationSelected.beach_name === location.beach_name) { // if location selected is true (which is defaulted to false) and the location item is equal to the user selected location (defaulted to null))
       
       setLocationSelected(null); //null to deselect location if conditions above hold
-      setSurfDisplay(false); 
+      setSurfDisplay(false);  // surf data isnt displayed yet
     } else {
       setLocationSelected(location); //set the user selected location
       fetchSurfConditions(location.beach_name); //fetch the surf data based off beach name on press
-      setSurfDisplay(false);
+      setSurfDisplay(false); //surf data still not displayed until prompted by user
     } 
   };
 const handleSurfDisplay = () => {
@@ -73,11 +72,12 @@ const handleSurfDisplay = () => {
 
 const saveLocation = async (location) => { //function so that users can save spots on their device locally using AsyncStorage
     const savedLocations = await AsyncStorage.getItem('savedLocations'); //retrieve saved locations from local storage
-    const parsedLocations = JSON.parse(savedLocations); // parse 
-      if (!parsedLocations.some(loc => loc.beach_name === location.beach_name)) {
-        parsedLocations.push(location);
-        await AsyncStorage.setItem('savedLocations', JSON.stringify(parsedLocations));
-        alert('Beach saved to MyBreaks!');
+    const parsedLocations = JSON.parse(savedLocations); // parse json data after retrieval because Async storage can only directly store strings of data
+      if (!parsedLocations.some(loc => loc.beach_name === location.beach_name)) // check that the location hasnt already been saved 
+       {
+        parsedLocations.push(location); //adding the new location to the array if the above holds
+        await AsyncStorage.setItem('savedLocations', JSON.stringify(parsedLocations)); //back into a json string
+        alert('Beach saved to MyBreaks!'); //notification
       } else {
         alert('Already saved to MyBreaks');
       }
@@ -85,7 +85,7 @@ const saveLocation = async (location) => { //function so that users can save spo
   
   return (  //returns what user is able to see and interact with
     <ImageBackground
-      source={require('@/assets/images/water2.png')} // Replace with your background image path
+      source={require('@/assets/images/water2.png')} 
       style={styles.backgroundImage}
       imageStyle={styles.image}
     >
@@ -113,31 +113,33 @@ const saveLocation = async (location) => { //function so that users can save spo
           >
             <Text style={styles.locationText}>{item.beach_name}</Text> 
           </Pressable>  
-          {locationSelected && locationSelected.beach_name === item.beach_name && ( 
+          { locationSelected && locationSelected.beach_name === item.beach_name &&  ( //if there is no location selected and then the user clicks on the location item
             <View style={styles.descriptionContainer}> 
               <Image
-                source={require('@/assets/images/wave.jpg')} //image of location, would have to add these seperately to a database somehow, not unique to each location
+                source={require('@/assets/images/wave.jpg')} //same image for every location, would have liked to added images of each beach 
                 style={styles.peaseBay} //image styles
               />
-              <Text style={styles.descriptionText}>{locationSelected.description}</Text>
+
+              <Text style={styles.descriptionText}>{locationSelected.description}</Text> 
               <TouchableOpacity
-                    style={styles.saveButton}
-                    onPress={() => saveLocation(locationSelected)}
-                  >
+                    style={styles.saveButton} 
+                    onPress={() => saveLocation(locationSelected)} // call save location button function
+                  > 
                     <Text style={styles.saveButtonText}>Save Location</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                         // button that user can press to see surf data
-                  style={styles.surfDisplayButton} //styling for the button
+                  style={styles.surfDisplayButton}
                   onPress={handleSurfDisplay} //call to surf data display function
                 >
-                  <Text style={styles.surfDisplayButtonText}>
-                    See todays surf!
+    
+                  <Text style={styles.surfDisplayButtonText}> 
+                    See todays surf! 
                   </Text> 
-                </TouchableOpacity>
-                {surfDisplay && surfConditions && (
+                </TouchableOpacity> 
+                {surfDisplay && surfConditions && ( //all the surf forecasting information, rendered if not already displayed
                   <ScrollView horizontal style={styles.surfConditionsContainer}> 
-                    {surfConditions.map((condition, index) => ( 
+                    {surfConditions.map((condition, index) => ( //react native map function for each condition reading (per hour) iterated over by index
                       <View key={index} style={styles.conditionItem}>
                         <Text style={styles.conditionText}>
                           Time: {new Date(condition.time).toLocaleTimeString()}
@@ -155,7 +157,7 @@ const saveLocation = async (location) => { //function so that users can save spo
                           Wind Speed: {condition.windSpeed.sg} mph
                         </Text>
                         <Text style={styles.conditionText}>
-                          Wind Direction: {convertWindDirection(condition.windDirection.sg)} 
+                          Wind Direction: {convertWindDirection(condition.windDirection.sg)}  
                         </Text> 
                       </View>
                     ))}
@@ -174,7 +176,6 @@ const saveLocation = async (location) => { //function so that users can save spo
 
 export default Home;
 
-//I kept breaking code by commenting inside of the surfdisplay container but basically what that whole section of code does is  
 
 // all the styles for the home component
 
@@ -282,3 +283,5 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
 });
+
+//should have done more error checks

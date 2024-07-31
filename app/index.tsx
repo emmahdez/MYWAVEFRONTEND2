@@ -5,7 +5,7 @@ import { Link, Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 
-export default function WelcomeScreen() {
+export default function WelcomeScreen() {  //main entry route to acces the rest of the app, react-native expo's version of app.js
   return (
     <ImageBackground
       source={require('@/assets/images/wavey.png')}
@@ -15,11 +15,13 @@ export default function WelcomeScreen() {
         <Text style={styles.text}>Welcome to MyWave!</Text>
         <Text style={styles.description}>24hr surf forecasts for the best spots in Scotland</Text>
         <StatusBar style="auto" />
-        <Link href= "../tabs/home" style={styles.link}>Press here to explore</Link>
+        <Link href= "../tabs/home" style={styles.link}>Press here to explore</Link> 
       </View>
     </ImageBackground>
   );
 }
+
+//all the styles for the welcome screen 
 
 const styles = StyleSheet.create({
   background: {

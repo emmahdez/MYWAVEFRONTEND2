@@ -5,35 +5,32 @@ import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 
 const MyBreaks = () => {
-  const [savedLocations, setSavedLocations] = useState([]);
-  const [locationSummaries, setLocationSummaries] = useState({});
+  const [savedLocations, setSavedLocations] = useState([]); //hook to initialize saved locations to an empty array
+  const [locationSummaries, setLocationSummaries] = useState({}); //hook to initialize the summaries to an empty object
 
-  const fetchSavedLocations = async () => {
+  useEffect(() => {
+  const fetchSavedLocations = async () => { //fetching saved locations from Async storage 
     try {
-      const savedLocations = await AsyncStorage.getItem('savedLocations');
+      const savedLocations = await AsyncStorage.getItem('savedLocations'); //savedLocations coming from the home screen component, stored in React Native Async storage
       if (savedLocations) {
-        const locations = JSON.parse(savedLocations);
+        const locations = JSON.parse(savedLocations); 
         setSavedLocations(locations);
 
-        const summaries = {};
+        const summaries = {}; //initializing an empty object to store the conditions summary
         for (const location of locations) {
-          const response = await axios.get(`http://192.168.0.24:8000/summary/?beach_name=${encodeURIComponent(location.beach_name)}`);
+          const response = await axios.get(`http://192.168.0.24:8000/summary/?beach_name=${encodeURIComponent(location.beach_name)}`); // GET request to Django
           summaries[location.beach_name] = response.data.conditions;
         }
         setLocationSummaries(summaries);
       }
     } catch (error) {
-      console.error('Failed to get summary', error);
+      console.error('Failed to get summary', error); //error log to console, should do more error checks 
     }
   };
+      fetchSavedLocations(); 
+    }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchSavedLocations();
-    }, [])
-  );
-
-  const removeFromSaved= async (beachName) => {
+  const removeFromSaved= async (beachName) => { //a function so that a user can remove a beach from their saved beaches
     try {
       const updatedLocations = savedLocations.filter(loc => loc.beach_name !== beachName);
       await AsyncStorage.setItem('savedLocations', JSON.stringify(updatedLocations));
@@ -52,6 +49,7 @@ const MyBreaks = () => {
     >
       <View style={styles.container}>
         <Text style={styles.text}>My Breaks</Text>
+        <Text style={styles.yourBeachesText}>Summary of your favourite beaches surf for today:</Text>
         {savedLocations.length > 0 ? (
           <FlatList
             data={savedLocations}
@@ -63,7 +61,7 @@ const MyBreaks = () => {
                   <Text style={styles.summaryText}>{locationSummaries[item.beach_name]}</Text>
                 )}
                 <TouchableOpacity onPress={() => removeFromSaved(item.beach_name)}>
-                  <Text style={styles.removeText}>Remove from MyBreaks</Text>
+                  <Text style={styles.removeText}>Remove from saved</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -97,6 +95,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: 'center',
   },
+  yourBeachesText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+
   locationItem: {
     padding: 16,
     borderRadius: 8,
@@ -112,9 +118,8 @@ const styles = StyleSheet.create({
   summaryText: {
     fontSize: 16,
     color: '#000000',
-    position: 'absolute',
-    top:18,
-    left:100
+    fontWeight:'bold',
+   
   },
   removeText: {
     fontSize: 16,
