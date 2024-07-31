@@ -14,30 +14,30 @@ const MyBreaks = () => {
       const savedLocations = await AsyncStorage.getItem('savedLocations'); //savedLocations coming from the home screen component, stored in React Native Async storage
       if (savedLocations) {
         const locations = JSON.parse(savedLocations); 
-        setSavedLocations(locations);
+        setSavedLocations(locations); //updating the state of savedLocations to the locations from the parsed json data
 
         const summaries = {}; //initializing an empty object to store the conditions summary
         for (const location of locations) {
           const response = await axios.get(`http://192.168.0.24:8000/summary/?beach_name=${encodeURIComponent(location.beach_name)}`); // GET request to Django
-          summaries[location.beach_name] = response.data.conditions;
+          summaries[location.beach_name] = response.data.conditions; //storing summary of conditions
         }
-        setLocationSummaries(summaries);
+        setLocationSummaries(summaries); //updating state
       }
     } catch (error) {
       console.error('Failed to get summary', error); //error log to console, should do more error checks 
     }
   };
-      fetchSavedLocations(); 
-    }, []);
+      fetchSavedLocations();  //calling the function 
+    }, []); // empty dependency
 
-  const removeFromSaved= async (beachName) => { //a function so that a user can remove a beach from their saved beaches
+  const removeFromSaved= async (beachName) => { //a function so that a user can remove from their saved beaches
     try {
-      const updatedLocations = savedLocations.filter(loc => loc.beach_name !== beachName);
-      await AsyncStorage.setItem('savedLocations', JSON.stringify(updatedLocations));
-      setSavedLocations(updatedLocations);
+      const updatedLocations = savedLocations.filter(loc => loc.beach_name !== beachName); //removing the location from async storage using a filter 
+      await AsyncStorage.setItem('savedLocations', JSON.stringify(updatedLocations)); //updating the storage
+      setSavedLocations(updatedLocations); //udpating the state 
 
     } catch (error) {
-      console.error(error);
+      console.error(error); //error log, should do more
     }
   };
 
@@ -50,11 +50,11 @@ const MyBreaks = () => {
       <View style={styles.container}>
         <Text style={styles.text}>My Breaks</Text>
         <Text style={styles.yourBeachesText}>Summary of your favourite beaches surf for today:</Text>
-        {savedLocations.length > 0 ? (
+        {savedLocations.length > 0 ? ( //if the length of the list is >0 then the flatlist is rendered 
           <FlatList
             data={savedLocations}
-            keyExtractor={(item) => item.beach_name}
-            renderItem={({ item }) => (
+            keyExtractor={(item) => item.beach_name} //beach name is the unique identifier
+            renderItem={({ item }) => ( //render function for each saved location, i.e beach name, conditions summary and option to remove
               <View style={styles.locationItem}>
                 <Text style={styles.locationText}>{item.beach_name}</Text>
                 {locationSummaries[item.beach_name] && (
@@ -67,12 +67,14 @@ const MyBreaks = () => {
             )}
           />
         ) : (
-          <Text style={styles.noLocationsText}>No saved locations</Text>
+          <Text style={styles.noLocationsText}>No saved locations</Text> //if there are no locations saved
         )}
       </View>
     </ImageBackground>
   );
 };
+
+//all the styles for the myBreaks component
 
 const styles = StyleSheet.create({
   backgroundImage: {

@@ -39,7 +39,7 @@ const Home = () => {  //Home screen component
         setReturnedLocations(locationApi.data) //set returned locations state (via user search )as the returned data 
     };
    fetchLocations(); //call the to the fetchLocation function to run async operation
-  }, []); // empty dependency array
+  }, []); // empty dependency array, ensures useEffect runs once
 
   const manageSearch = (userSearch) => { //function that deals with user input of search bar 
     setSearch(userSearch); //make search state the user input
