@@ -3,7 +3,16 @@ import { StyleSheet, Text, View , FlatList,TextInput,ActivityIndicator,Pressable
 import axios from 'axios'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const convertWindDirection = (degrees) => { //a function to convert the surf data wind direction field to cardinal (i.e N,E,S,W etc...)
+/**
+ * a function to convert the surf data 
+ * wind direction field to cardinal (i.e N,E,S,W etc...)
+ * @param {number} degrees -wind direction in degrees by default
+ * @returns {string} - convert to cardinal
+ */
+
+
+
+const convertWindDirection = (degrees) => { 
 if (degrees >= 350 || degrees <= 10) return 'N';
 if (degrees >= 20 && degrees <= 30) return 'N/NE';
 if (degrees >= 40 && degrees <= 50) return 'NE';
@@ -23,7 +32,11 @@ if (degrees >= 330 && degrees <= 340) return 'NE';
 else return 'Unknown'; // if degrees is out of range
 };
 
-
+/**
+ * Home Screen component
+ * @component
+ * @returns {JSX.Element}
+ */
 const Home = () => {  //Home screen component
   const[locations,setLocations] = useState([]); // useState hook to initialize an empty array, to then store fetched location data from useEffect 
   const[search, setSearch] = useState(''); // hook to initialize an empty string, to then store user inputed string in the search bar 
@@ -46,7 +59,11 @@ const Home = () => {  //Home screen component
   fetchLocations(); //call the to the fetchLocation function to run async operation
   }, []); // empty dependency array, ensures useEffect runs once
 
-  const manageSearch = (userSearch) => { //function that deals with user input of search bar 
+/**
+ * function that deals with user input of search bar 
+ * @param {string} userSearch 
+ */
+  const manageSearch = (userSearch) => { 
     try{
     setSearch(userSearch); //make search state the user input
     const response = locations.filter(item =>  //search filter response
@@ -58,6 +75,10 @@ const Home = () => {  //Home screen component
   }
   };
 
+  /**
+   * Function to get the surf conditions for a selected beach
+   * @param {string} beachName 
+   */
   const fetchSurfConditions = async (beachName) => {
     try{
       const response = await axios.get(`http://192.168.1.91:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django
@@ -67,7 +88,12 @@ const Home = () => {  //Home screen component
     }
   };
 
-  const handlePress = (location) => { //function that deals with a user selecting a location by pressing on it 
+  /**
+   * function that deals with a user 
+   * selecting a location by pressing on it 
+   * @param {Object} location 
+   */
+  const handlePress = (location) => { 
     try{
     if (locationSelected && locationSelected.beach_name === location.beach_name) { // if location selected is true (which is defaulted to false) and the location item is equal to the user selected location (defaulted to null))
       
@@ -82,15 +108,23 @@ const Home = () => {  //Home screen component
     console.error(error)
   }
 };
+
+
 const handleSurfDisplay = () => {
   try {
-    setSurfDisplay(!surfDisplay);  //display the surf data, make not false so it shows onpress below
+    setSurfDisplay(!surfDisplay);  //display the surf data, make not false so it shows onpress below in return
   } catch (error) {
     console.error(error);
   }
 };
 
-const saveLocation = async (location) => { //function so that users can save spots on their device locally using AsyncStorage
+
+/**
+ * function so that users can save 
+ * spots on their device locally using AsyncStorage
+ * @param {Object} location 
+ */
+const saveLocation = async (location) => { 
   try{
     const savedLocations = await AsyncStorage.getItem('savedLocations'); //retrieve saved locations from local storage
     const parsedLocations = JSON.parse(savedLocations); // parse json data after retrieval because Async storage can only directly store strings of data

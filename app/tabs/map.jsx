@@ -3,6 +3,11 @@ import MapView, { Marker } from 'react-native-maps';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 ;
+/**
+ * Map component
+ * @component
+ * @returns  {JSX.Element}
+ */
 
 const Map = () => { // Map component
   const [locations, setLocations] = useState([]); // Hook to initialize empty array to hold location data
@@ -21,7 +26,14 @@ const Map = () => { // Map component
     fetchLocations();
   }, []);
 
-  // Filter locations based on search input and filters out the markers according to what the user is inputting in the search string
+/**
+ * Filter locations based on search input and 
+ * filters out the markers according to 
+ * what the user is inputting in the search string
+ * @param {Object} location
+ * @param {string} -user input
+ * @returns {Array} - filtered markers
+ */
   const filteredBeaches = locations.filter(location => { //a filtering function for the user search bar 
     const matchesSearchMap = location.beach_name.toLowerCase().includes(searchMap.toLowerCase()); //case insensitive
     const matchesFilter = filter === '' || location.beach_type === filter; 

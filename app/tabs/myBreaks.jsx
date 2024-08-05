@@ -4,6 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 
+/**
+ * MyBreaks screen component
+ * @component
+ * @returns {JSX.Element}
+ */
+
 const MyBreaks = () => {
   const [savedLocations, setSavedLocations] = useState([]); //hook to initialize saved locations to an empty array
   const [locationSummaries, setLocationSummaries] = useState({}); //hook to initialize the summaries to an empty object
@@ -30,6 +36,11 @@ const MyBreaks = () => {
       fetchSavedLocations();  //calling the function 
     }, []); // empty dependency
 
+
+  /**
+   * 
+   * @param {string} beachName 
+   */
   const removeFromSaved= async (beachName) => { //a function so that a user can remove from their saved beaches
     try {
       const updatedLocations = savedLocations.filter(loc => loc.beach_name !== beachName); //removing the location from async storage using a filter 
