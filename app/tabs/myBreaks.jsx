@@ -18,7 +18,7 @@ const MyBreaks = () => {
 
         const summaries = {}; //initializing an empty object to store the conditions summary
         for (const location of locations) {
-          const response = await axios.get(`http://192.168.0.24:8000/summary/?beach_name=${encodeURIComponent(location.beach_name)}`); // GET request to Django
+          const response = await axios.get(`http://192.168.1.91:8000/summary/?beach_name=${encodeURIComponent(location.beach_name)}`); // GET request to Django
           summaries[location.beach_name] = response.data.conditions; //storing summary of conditions
         }
         setLocationSummaries(summaries); //updating state

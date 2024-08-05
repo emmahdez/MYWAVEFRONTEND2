@@ -11,9 +11,13 @@ const Map = () => { // Map component
 
   useEffect(() => { // useEffect to fetch locations from django
     const fetchLocations = async () => {
-        const response = await axios.get('http://192.168.0.24:8000/locations/'); // GET request to Django
+      try{
+        const response = await axios.get('http://192.168.1.91:8000/locations/'); // GET request to Django
         setLocations(response.data); // Set the locations to be the fetched data
-    };
+    } catch(error) {
+      console.error(error);
+    }
+  };
     fetchLocations();
   }, []);
 

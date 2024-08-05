@@ -34,28 +34,41 @@ const Home = () => {  //Home screen component
   
   useEffect(() => { //useEffect to fetch location data from Django backend
     const fetchLocations = async () => {
-        const locationApi = await axios.get('http://192.168.0.24:8000/locations/'); //GET request to Django
+      try{
+        const locationApi = await axios.get('http://192.168.1.91:8000/locations/'); //GET request to Django
         setLocations(locationApi.data); //set locations state as ALL the returned data
-        setReturnedLocations(locationApi.data) //set returned locations state (via user search )as the returned data 
-    };
-   fetchLocations(); //call the to the fetchLocation function to run async operation
+        setReturnedLocations(locationApi.data); //set returned locations state (via user search )as the returned data 
+    } catch (error) {
+      console.error(error); //log error to the console 
+    }
+  };
+
+  fetchLocations(); //call the to the fetchLocation function to run async operation
   }, []); // empty dependency array, ensures useEffect runs once
 
   const manageSearch = (userSearch) => { //function that deals with user input of search bar 
+    try{
     setSearch(userSearch); //make search state the user input
     const response = locations.filter(item =>  //search filter response
       item.beach_name.toLowerCase().includes(userSearch.toLowerCase()) //toLowerCase makes it case insensitive
 
     ); setReturnedLocations(response); //make returned location state the response of the users search 
+  }  catch(error) {
+    console.error(error);
+  }
   };
 
   const fetchSurfConditions = async (beachName) => {
-      const response = await axios.get(`http://192.168.0.24:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django
+    try{
+      const response = await axios.get(`http://192.168.1.91:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django
       setSurfConditions(response.data.data.hours); //nested data to return hourly data 
-  
+    } catch(error) {
+      console.error(error);
+    }
   };
 
   const handlePress = (location) => { //function that deals with a user selecting a location by pressing on it 
+    try{
     if (locationSelected && locationSelected.beach_name === location.beach_name) { // if location selected is true (which is defaulted to false) and the location item is equal to the user selected location (defaulted to null))
       
       setLocationSelected(null); //null to deselect location if conditions above hold
@@ -65,12 +78,20 @@ const Home = () => {  //Home screen component
       fetchSurfConditions(location.beach_name); //fetch the surf data based off beach name on press
       setSurfDisplay(false); //surf data still not displayed until prompted by user
     } 
-  };
+  }catch(error) {
+    console.error(error)
+  }
+};
 const handleSurfDisplay = () => {
-  setSurfDisplay(!surfDisplay); //display the surf data, make not false so it shows onpress below
-}
+  try {
+    setSurfDisplay(!surfDisplay);  //display the surf data, make not false so it shows onpress below
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const saveLocation = async (location) => { //function so that users can save spots on their device locally using AsyncStorage
+  try{
     const savedLocations = await AsyncStorage.getItem('savedLocations'); //retrieve saved locations from local storage
     const parsedLocations = JSON.parse(savedLocations); // parse json data after retrieval because Async storage can only directly store strings of data
       if (!parsedLocations.some(loc => loc.beach_name === location.beach_name)) // check that the location hasnt already been saved 
@@ -81,7 +102,10 @@ const saveLocation = async (location) => { //function so that users can save spo
       } else {
         alert('Already saved to MyBreaks');
       }
-    };
+    } catch(error) {
+      console.error(error);
+    }
+};
   
   return (  //returns what user is able to see and interact with
     <ImageBackground
