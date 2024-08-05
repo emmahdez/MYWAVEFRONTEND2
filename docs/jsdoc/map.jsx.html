@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: map.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: map.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { StyleSheet, Text, View, TextInput,ActionSheetIOS,Button,ImageBackground} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+;
+/**
+ * Map component
+ * @component
+ * @returns  {JSX.Element}
+ */
+
+const Map = () => { // Map component
+  const [locations, setLocations] = useState([]); // Hook to initialize empty array to hold location data
+  const [searchMap, setSearchMap] = useState(''); // Hook to initialize empty string for a user search
+  const [filter, setFilter] = useState(''); // Hook to initialize an empty string for filtering 
+
+  useEffect(() => { // useEffect to fetch locations from django
+    const fetchLocations = async () => {
+      try{
+        const response = await axios.get('http://192.168.1.91:8000/locations/'); // GET request to Django
+        setLocations(response.data); // Set the locations to be the fetched data
+    } catch(error) {
+      console.error(error);
+    }
+  };
+    fetchLocations();
+  }, []);
+
+/**
+ * Filter locations based on search input and 
+ * filters out the markers according to 
+ * what the user is inputting in the search string
+ * @param {Object} location
+ * @param {string} -user input
+ * @returns {Array} - filtered markers
+ */
+  const filteredBeaches = locations.filter(location => { //a filtering function for the user search bar 
+    const matchesSearchMap = location.beach_name.toLowerCase().includes(searchMap.toLowerCase()); //case insensitive
+    const matchesFilter = filter === '' || location.beach_type === filter; 
+    return matchesSearchMap &amp;&amp; matchesFilter; //returns user input
+  });
+
+   // React native ActionSheetIOS to filter the markers, tried using Picker but I couldnt get it to function, Picker would be better
+   const showActionSheet = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        title: 'Select a beach type',
+        options: ['All Beach Types', 'Sandy', 'Reef break', 'Cancel'],
+        cancelButtonIndex: 3, //indexing starts at 0
+      },
+      (buttonIndex) => { //index of selected option
+        const filterOptions = ['', 'Sandy', 'Reef break']; //emtpy string for placeholder of default which is "All beach types"
+        if (buttonIndex !== 3) {  //if the user doesnt select the cancel button
+          setFilter(filterOptions[buttonIndex]); //the filter is set to whichever option user selected
+        }
+      }
+    );
+  };
+
+ 
+  return (
+    &lt;View style={styles.container}>
+       &lt;ImageBackground
+        source={require('@/assets/images/water2.png')}
+        style={styles.inputContainer}
+        >
+        &lt;TextInput
+          style={styles.search}
+          placeholder='Search beach on map...'
+          value={searchMap}
+          onChangeText={setSearchMap}
+        /> 
+        &lt;Button title="Filter by beach type" onPress={showActionSheet}  /> 
+      &lt;/ImageBackground>
+      &lt;View style={styles.mapContainer}>
+        &lt;MapView
+          style={styles.map}
+          showsUserLocation={true} // React Native Maps functionality, shows user's current location
+          provider={MapView.PROVIDER_DEFAULT} // Provider default is Apple Maps
+        >
+          {filteredBeaches.map(location => (
+            &lt;Marker // Creating custom markers from Django location data
+              key={location.beach_name} // The beach name is the key
+              coordinate={{
+                latitude: parseFloat(location.latitude), // Lat and long coordinates where the marker will be placed from location data
+                longitude: parseFloat(location.longitude),
+              }}
+              title={location.beach_name} // Shows the beach name
+              description={`Beach Type: ${location.beach_type}`} // Shows the beach type
+            />
+          ))}
+        &lt;/MapView>
+      &lt;/View>
+    &lt;/View>
+  );
+}
+
+export default Map;
+
+// All the styles for the map component
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  inputContainer: {
+    position: 'absolute', 
+    flexDirection: 'row',
+    padding: 10,
+    backgroundColor: '#aad3f2',
+    zIndex: 1, 
+    elevation: 4, 
+    alignItems: 'center',
+    paddingTop:40,
+    
+
+  },
+  search: {
+    flex: 1,
+    height: 50,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: 'white', 
+  },
+  mapContainer: {
+    flex: 1,
+  },
+  map: {
+    flex: 1,
+  },
+});
+
+
+//should have done more error checks</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Home">Home</a></li><li><a href="global.html#Map">Map</a></li><li><a href="global.html#MyBreaks">MyBreaks</a></li><li><a href="global.html#convertWindDirection">convertWindDirection</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Mon Aug 05 2024 13:27:11 GMT+0100 (British Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -4,11 +4,6 @@ import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Link, Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
-/**
- * Welcome screen component, entry route into the app
- * @component
- * @returns {JSX.Element}
- */
 
 export default function WelcomeScreen() {  //main entry route to acces the rest of the app, react-native expo's version of app.js
   return (
