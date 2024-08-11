@@ -48,7 +48,7 @@ const Home = () => {  //Home screen component
   useEffect(() => { //useEffect to fetch location data from Django backend
     const fetchLocations = async () => {
       try{
-        const locationApi = await axios.get('http://192.168.1.91:8000/locations/'); //GET request to Django
+        const locationApi = await axios.get('http://192.168.0.24:8000/locations/'); //GET request to Django
         setLocations(locationApi.data); //set locations state as ALL the returned data
         setReturnedLocations(locationApi.data); //set returned locations state (via user search )as the returned data 
     } catch (error) {
@@ -81,7 +81,7 @@ const Home = () => {  //Home screen component
    */
   const fetchSurfConditions = async (beachName) => {
     try{
-      const response = await axios.get(`http://192.168.1.91:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django
+      const response = await axios.get(`http://192.168.0.24:8000/forecast/?beach_name=${encodeURIComponent(beachName)}`); //GET request to Django
       setSurfConditions(response.data.data.hours); //nested data to return hourly data 
     } catch(error) {
       console.error(error);
